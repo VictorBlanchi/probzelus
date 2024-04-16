@@ -1,3 +1,6 @@
+(** TIC TAC TOE
+ This file provides a simple implementation of an engine for tic tac toe game *)
+
 type player = Cross | Circle
 type move = int * int
 type mark = player option
