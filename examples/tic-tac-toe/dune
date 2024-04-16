@@ -2,6 +2,6 @@
  (dev
   (flags (:standard -w -9-27-33 -warn-error -A))))
 
-(library
- (name tictactoe)
+(executable
+ (name print)
  (libraries graphics))
