@@ -29,6 +29,7 @@ let draw_player (factor : int) (p : Engine.player) ((x, y) : Engine.move) : unit
 
 (** [draw_grid factor n] draws the grid of size [n] *)
 let draw_grid (factor : int) (n : int) : unit =
+  set_color black;
   let moveto x y : unit = moveto (2 * factor * x) (2 * factor * y) in
   let lineto x y : unit = lineto (2 * factor * x) (2 * factor * y) in
   for i = 0 to n do
@@ -38,8 +39,8 @@ let draw_grid (factor : int) (n : int) : unit =
     lineto i n
   done
 
-(** [draw_state factor s] draws the state [s] of the game*)
-let draw_state (factor : int) (s : Engine.state) : unit =
+(** [draw_board factor s] draws the board [s] of the game*)
+let draw_board (factor : int) (s : Engine.board) : unit =
   let n = Array.length s in
   assert (n > 0);
   let m = Array.length s.(0) in
@@ -58,6 +59,5 @@ let draw_state (factor : int) (s : Engine.state) : unit =
         l)
     s
 
-let () = open_graph ""
-let () = draw_state 100 @@ [| [| None; Some Cross |]; [| Some Circle; None |] |]
-let _ = wait_next_event []
+let pos_to_move (factor : int) (n : int) (x : int) (y : int) : Engine.move =
+  (n - ((y / (2 * factor)) + 1), x / (2 * factor))
