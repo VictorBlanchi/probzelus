@@ -20,8 +20,6 @@ let length (b : board) : int =
 (** [is_valid s m] checks if the move [m] is valid in the board [s] *)
 let is_valid (s : board) (m : move) : bool =
   let i, j = m in
-  print_int i;
-  print_int j;
   try s.(i).(j) = None with _ -> false
 
 let assign (a : 'a array) (i : int) (v : 'a) =
@@ -47,7 +45,7 @@ let diag2 (s : board) : mark array =
   assert (n = m);
   Array.mapi (fun i l -> l.(n - i - 1)) s
 
-let win (s : board) (p : player) : bool =
+let has_won (s : board) (p : player) : bool =
   let check (t : mark array) = Array.for_all (fun x -> x = Some p) t in
   let n = Array.length s in
   let lines = List.map (line s) (List.init n (fun x -> x)) in
@@ -55,6 +53,12 @@ let win (s : board) (p : player) : bool =
   let diags = [ diag1 s; diag2 s ] in
   let aligned = List.concat [ lines; rows; diags ] in
   List.exists (fun t -> check t) aligned
+
+let is_block (s : board) : bool =
+  Array.for_all
+    (fun t ->
+      Array.for_all (fun m -> match m with None -> false | Some _ -> true) t)
+    s
 
 let switch_player (p : player) : player =
   match (p : player) with Cross -> Circle | Circle -> Cross
