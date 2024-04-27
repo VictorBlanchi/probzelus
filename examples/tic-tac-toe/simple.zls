@@ -1,0 +1,35 @@
+open Tictactoe
+open Probzelus
+open Engine
+
+let node utility ((b , m) : board * move) =
+  if has_won (transition b m Circle) Circle 
+  then 100000.
+  else 0.
+
+let proba model (b : board) = (m : move) where
+  rec m = Infer_pf.sample (Distribution.uniform_list (valid_moves b))
+  and u = utility (b , m)
+  and () = print u
+  and () = Infer_pf.factor u
+
+let factor = 100
+let n = 3
+
+let node main () = () where
+  rec
+  automaton
+  | ME ->
+    do
+      move = interactive_player factor (last board)
+      and player = Cross
+    then AI
+  | AI ->
+    do
+      move = Distribution.draw (Infer_pf.infer 10 model (last board))
+      and player = Circle
+    then ME
+  end
+  and
+  init board = (Tictactoe.restart factor n)
+  and board = (Tictactoe.play_one factor (last board) player move)

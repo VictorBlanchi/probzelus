@@ -1,0 +1,12 @@
+type board
+type move
+type player = Cross | Circle
+
+val valid_moves : board -> move list
+val length: board -> int
+val has_won: board -> player -> bool
+val is_block: board -> bool
+val is_terminal: board -> bool
+val switch_player: player -> player
+val transition: board -> move -> player -> board
+val print: float -AD-> unit

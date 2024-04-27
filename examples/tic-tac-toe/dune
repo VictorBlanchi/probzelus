@@ -4,4 +4,26 @@
 
 (executable
  (name main)
- (libraries graphics))
+ (libraries zelus graphics probzelus)
+ (link_flags -linkall))
+
+(rule
+ (targets smart.ml main.ml)
+ (deps (:src smart.zls) )
+ (action (run probzeluc -deps -s main %{src})))
+
+; (rule
+;  (targets smart.ml smart_main.ml)
+;  (deps (:src smart.zls) )
+;  (action (run probzeluc -deps -s main %{src})))
+
+; (rule
+;  (targets engine.zci)
+;  (deps (:src engine.zli))
+;  (action (run probzeluc %{src})))
+
+; (rule
+;  (targets tictactoe.zci)
+;  (deps (:src tictactoe.zli))
+;  (action (run probzeluc %{src})))
+

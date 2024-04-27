@@ -6,6 +6,8 @@ type move = int * int
 type mark = player option
 type board = mark array array
 
+let to_move (x : int) (y : int) : move = (x, y)
+
 (** [new_board n] returns a new board of size [n*n] *)
 let new_board (n : int) : board =
   Array.init n (fun _ -> Array.init n (fun _ -> None))
@@ -17,10 +19,17 @@ let length (b : board) : int =
   assert (n = m);
   n
 
-(** [is_valid s m] checks if the move [m] is valid in the board [s] *)
+(** [is_valid b m] checks if the move [m] is valid in the board [b] *)
 let is_valid (s : board) (m : move) : bool =
   let i, j = m in
   try s.(i).(j) = None with _ -> false
+
+(** [valid_moves b] returns the list of valid moves in board *)
+let valid_moves (b : board) : move list =
+  let n = length b in
+  List.filter (is_valid b)
+  @@ List.concat @@ List.init n
+  @@ fun i -> List.init n @@ fun j -> (i, j)
 
 let assign (a : 'a array) (i : int) (v : 'a) =
   let b = Array.copy a in
@@ -34,10 +43,16 @@ let transition (s : board) (m : move) (p : player) =
   let new_row = assign s.(i) j (Some p) in
   assign s i new_row
 
+(** [line s i] returns the [i]th line of [s] *)
 let line (s : board) (i : int) = s.(i)
+
+(** [row s j] returns the [j]th row of [s] *)
 let row (s : board) (j : int) = Array.map (fun l -> l.(j)) s
+
+(** [diag1 s] returns one diagonal of [s] *)
 let diag1 (s : board) : mark array = Array.mapi (fun i l -> l.(i)) s
 
+(** [diag1 s] returns the other diagonal of [s] *)
 let diag2 (s : board) : mark array =
   let n = Array.length s in
   assert (not (n = 0));
@@ -45,20 +60,28 @@ let diag2 (s : board) : mark array =
   assert (n = m);
   Array.mapi (fun i l -> l.(n - i - 1)) s
 
-let has_won (s : board) (p : player) : bool =
+(** [has_won b p] checks whether player [p] has won in [s] *)
+let has_won (b : board) (p : player) : bool =
   let check (t : mark array) = Array.for_all (fun x -> x = Some p) t in
-  let n = Array.length s in
-  let lines = List.map (line s) (List.init n (fun x -> x)) in
-  let rows = List.map (row s) (List.init n (fun x -> x)) in
-  let diags = [ diag1 s; diag2 s ] in
+  let n = Array.length b in
+  let lines = List.map (line b) (List.init n (fun x -> x)) in
+  let rows = List.map (row b) (List.init n (fun x -> x)) in
+  let diags = [ diag1 b; diag2 b ] in
   let aligned = List.concat [ lines; rows; diags ] in
   List.exists (fun t -> check t) aligned
 
+(** [is_block s] checks if the board [s] is blocked*)
 let is_block (s : board) : bool =
   Array.for_all
     (fun t ->
       Array.for_all (fun m -> match m with None -> false | Some _ -> true) t)
     s
 
+(** [is_terminal b] checks if the board [b] is blocked or if a player has won *)
+let is_terminal (b : board) : bool =
+  is_block b || has_won b Cross || has_won b Circle
+
 let switch_player (p : player) : player =
   match (p : player) with Cross -> Circle | Circle -> Cross
+
+let print x = print_endline (string_of_float x)

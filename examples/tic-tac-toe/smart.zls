@@ -1,0 +1,64 @@
+open Tictactoe
+open Probzelus
+open Engine
+open Nested_infer
+
+let node utility ((b , p) : board * player) =
+    if has_won b p
+    then 10.
+    else if has_won b (switch_player p)
+    then -. 10.
+    else 0.
+
+let node from m = nat where
+  rec nat = m -> pre nat + 1
+
+let proba simulate ((b0, p0, m0) : board * player * move) =
+    (u: float) where
+    rec p = p0 fby switch_player p
+    and init b = b0
+    and init m = m0
+    and automaton
+    | NotTerminal ->
+      do m = m0 -> Distribution.draw (nested_infer_alice (last b , p))
+      and () = print_int (from 0); print_newline ()
+      and b = transition (last b) m p
+      and u = 0.
+      until (is_terminal b) then Terminal
+    | Terminal ->
+      do u = utility (b, p0) done
+    end
+    
+let node move_prior (b : board)  = (m : move Distribution.t) where
+  rec m = Distribution.uniform_list (valid_moves b)
+
+let proba model ((b, p) : board * player) = (m : move) where
+  rec m = Infer_pf.sample (move_prior b)
+  and eu = Distribution.mean_float (nested_infer_bob (b, p, m))
+  and () = Infer_pf.factor eu
+
+let factor = 100
+let n = 3
+
+let node main () = () where
+  rec
+  automaton
+  | ME ->
+    do
+      move = interactive_player factor (last board)
+      and player = Cross
+    then AI
+  | AI ->
+    do
+      reset move = Distribution.draw
+        ( do_infer_alice
+	  model
+	  simulate
+	  (last board , player))
+	every true
+      and player = Circle
+    then ME
+  end
+  and
+  init board = (Tictactoe.restart factor n)
+  and board = (Tictactoe.play_one factor (last board) player move)
