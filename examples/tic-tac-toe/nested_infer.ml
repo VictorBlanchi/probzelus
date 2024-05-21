@@ -1,7 +1,7 @@
 open Probzelus
 open Ztypes
 
-let mutual_inference (depth : int) (n_part : int)
+let mutual_infer (depth : int) (n_part : int)
     (alice :
       (Infer_pf.prob * (('in_b -> 'out_b Distribution.t) * 'in_a), 'out_a) cnode)
     (bob :

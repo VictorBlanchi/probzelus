@@ -1,7 +1,6 @@
-type who = Alice | Bob
-
-val nested_infer_alice: Engine.board * Engine.player -> Engine.move Distribution.t
-val nested_infer_bob: Engine.board * Engine.player * Engine.move -> float Distribution.t
-val do_infer_alice: (Engine.board * Engine.player ~D~> Engine.move) -S->
-    		    (Engine.board * Engine.player * Engine.move ~D~> float) -S->
-		    Engine.board * Engine.player -D-> Engine.move Distribution.t
+val mutual_infer: int -S-> int -S->
+		  ((('in_b -S-> 'out_b Distribution.t) * 'in_a) ~D~> 'out_a) -S->
+    		  ((('in_b -S-> 'out_b Distribution.t) * 'in_a) ~D~> 'out_a) -S->
+     		  ('in_a -S-> 'out_a Distribution.t) -S->
+		  ('in_b -S-> 'out_b Distribution.t) -S->
+		  'in_a -D-> 'out_b Distribution.t
