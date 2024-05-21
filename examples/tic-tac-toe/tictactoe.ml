@@ -40,3 +40,8 @@ let rec interactive_player (factor : int) (b : Engine.board) : Engine.move =
         Printer.pos_to_move factor (Engine.length b) mouse_x mouse_y
   in
   if Engine.is_valid b m then m else interactive_player factor b
+
+let print_bool (b : bool) : unit =
+  match b with false -> () | true -> print_endline "true"
+
+let print_board : Engine.board -> unit = Printer.draw_board 100

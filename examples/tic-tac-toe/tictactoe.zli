@@ -3,3 +3,5 @@ open Engine
 val restart: int -> int -> board
 val play_one: int -> board -> player -> move -> board
 val interactive_player: int -> board -> move
+val print_bool: bool -AD-> unit
+val print_board: board -AD-> unit
