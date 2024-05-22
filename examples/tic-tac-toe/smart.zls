@@ -4,18 +4,16 @@ open Engine
 open Nested_infer
 open Infer_pf
 
+
+let display_size = 100
+let board_size = 3
+
 let node utility ((b , p) : board * player) =
     if has_won b p
     then 50.
     else if has_won b (switch_player p)
     then -. 100.
     else 0.
-
-let node from m = nat where
-  rec nat = m -> pre nat + 1
-
-let f = 100
-let n = 3
 
 let node move_prior (b : board)  = (m : move Distribution.t) where
   rec m = Distribution.uniform_list (valid_moves b)
@@ -24,10 +22,9 @@ let proba expected_utility (b0, p0, m0 : board * player * move) = (u : float) wh
      rec init b = b0
      and init u = 0.
      and p = p0 fby switch_player p
-     and () = print_float u; print_newline ()
      and automaton
     | NotTerminal ->
-      do m = m0 -> Distribution.draw (move_prior (last b))
+      do m = m0 -> sample (move_prior (last b))
       and b = transition (last b) m p
       and u = last u -. 5.
       until (is_terminal b) then Terminal
@@ -37,7 +34,7 @@ let proba expected_utility (b0, p0, m0 : board * player * move) = (u : float) wh
 
 let proba model ((b, p) : board * player) = (m : move) where
     rec m = sample (move_prior b)
-    and eu = expected_utility (b, Circle, m)
+    and eu = expected_utility (b, p, m)
     and () = factor eu
 
 let node main () = () where
@@ -45,7 +42,7 @@ let node main () = () where
   automaton
   | ME ->
     do
-      move = interactive_player f (last board)
+      move = interactive_player display_size (last board)
       and player = Cross
     then AI
   | AI ->
@@ -56,8 +53,8 @@ let node main () = () where
     then ME
   end
   and
-  init board = (Tictactoe.restart f n)
-  and board = (Tictactoe.play_one f (last board) player move)
+  init board = (Tictactoe.restart display_size board_size)
+  and board = (Tictactoe.play_one display_size (last board) player move)
 
 (* let proba simulate ((b0, p0, m0) : board * player * move) =
     (u: float) where
@@ -93,7 +90,7 @@ let node main () = () where
   automaton
   | ME ->
     do
-      move = interactive_player factor (last board)
+      move = interactive_player display_size (last board)
       and player = Cross
     then AI
   | AI ->
@@ -108,7 +105,7 @@ let node main () = () where
     then ME
   end
   and
-  init board = (Tictactoe.restart factor n)
-  and board = (Tictactoe.play_one factor (last board) player move)
+  init board = (Tictactoe.restart display_size board_size)
+  and board = (Tictactoe.play_one display_size (last board) player move)
 
  *)

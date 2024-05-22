@@ -41,7 +41,8 @@ let rec interactive_player (factor : int) (b : Engine.board) : Engine.move =
   in
   if Engine.is_valid b m then m else interactive_player factor b
 
-let print_bool (b : bool) : unit =
-  match b with false -> () | true -> print_endline "true"
-
-let print_board : Engine.board -> unit = Printer.draw_board 100
+(** Draw a distribution of move and then wait *)
+let draw_move_dist (factor : int) (b : Engine.board) (p : Engine.player)
+    (m_dist : Engine.move Distribution.t) : unit =
+  Printer.draw_move_dist factor b p m_dist;
+  ignore @@ wait_next_event [ Button_down ]

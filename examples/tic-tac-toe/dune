@@ -2,8 +2,8 @@
  (dev
   (flags (:standard -w -9-27-33 -warn-error -A))))
 
-(executable
- (name main)
+(executables
+ (names main main_nested)
  (libraries zelus graphics probzelus)
  (link_flags -linkall))
 
@@ -11,6 +11,11 @@
  (targets smart.ml main.ml)
  (deps (:src smart.zls) )
  (action (run probzeluc -deps -s main %{src})))
+
+(rule
+ (targets smart_nested.ml main_nested.ml)
+ (deps (:src smart_nested.zls) )
+ (action (run probzeluc -noreduce -deps -s main %{src} -o main_nested)))
 
 ; (rule
 ;  (targets smart.ml smart_main.ml)

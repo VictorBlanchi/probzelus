@@ -1,6 +1,14 @@
-val mutual_infer: int -S-> int -S->
-		  ((('in_b -S-> 'out_b Distribution.t) * 'in_a) ~D~> 'out_a) -S->
-    		  ((('in_b -S-> 'out_b Distribution.t) * 'in_a) ~D~> 'out_a) -S->
-     		  ('in_a -S-> 'out_a Distribution.t) -S->
-		  ('in_b -S-> 'out_b Distribution.t) -S->
-		  'in_a -D-> 'out_b Distribution.t
+val print_player: Engine.player -AD-> unit
+val apply: (('a->'b) * 'a) -A-> 'b
+val draw: ('a Distribution.t) -A-> 'a
+val map: (('a * 'p) -> 'b) -S-> 'p -A-> 'a Distribution.t -A-> 'b Distribution.t
+
+val mean_float: (float Distribution.t) -A-> float
+
+
+val nested_infer: int -S-> int -S->
+		  ((('in_b -> 'out_b Distribution.t) * 'in_a) ~D~> 'out_a) -S->
+    		  ((('in_a -> 'out_a Distribution.t) * 'in_b) ~D~> 'out_b) -S->
+     		  ('in_a -> 'out_a Distribution.t) -S->
+		  ('in_b -> 'out_b Distribution.t) -S->
+		  'in_a -D-> 'out_a Distribution.t
