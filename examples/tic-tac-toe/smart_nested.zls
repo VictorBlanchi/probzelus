@@ -1,0 +1,71 @@
+open Tictactoe
+open Probzelus
+open Engine
+open Nested_infer
+open Infer_pf
+
+let display_size = 100
+let board_size = 3
+
+let utility ((b : board), (p : player))=
+    if has_won b p
+    then 1000.
+    else if has_won b (switch_player p)
+    then -. 1000.
+    else 0.
+
+let move_dummy ((b : board), (p : player)) =
+  Distribution.uniform_list (valid_moves b)
+
+let simulate_dummy ((b0 : board), (p0 : player), (m0 : move)) =
+    Distribution.dirac (transition b0 m0 p0)
+
+let proba simulate
+    ((move_dist : board * player -> move Distribution.t),
+     ((b0, p0, m0) : board * player * move)) = (b : board) where
+     rec init b = (transition b0 m0 p0)
+     and init m = m0
+     and nat = 0 fby (nat + 1)
+     and init move_dist' = Distribution.dirac m0
+     and p = (switch_player p0) fby switch_player p
+     and automaton
+    | NotTerminal ->
+      do
+      move_dist' = apply (move_dist, (last b , p))
+      and m = sample move_dist'
+      and b = transition (last b) m p
+      and () = draw_move_dist display_size (last b) p move_dist'
+      and () = print_int nat
+      unless (is_terminal (last b)) then Terminal
+    | Terminal ->
+      do b = last b done
+    end
+
+let proba model
+    ((simulate_dist : board * player * move -> board Distribution.t),
+     ((b , p) : board * player)) = (m : move) where
+    rec m = sample (move_dummy (b, p))
+    and eu = mean_float (map utility p (apply (simulate_dist, (b, p, m) )))
+    and () = factor eu
+
+let node main () = () where
+  rec
+  automaton
+  | ME ->
+    do
+      move = interactive_player display_size (last board)
+      and move_dist = Distribution.dirac move
+      and player = Cross
+    then AI
+  | AI ->
+    do
+      reset move_dist = nested_infer 1 2 model simulate move_dummy simulate_dummy ((last board), player)
+	every true
+      and move = draw move_dist
+      and () = draw_move_dist display_size (last board) player move_dist
+      and player = Circle
+    then ME
+  end
+  and
+  init board = (Tictactoe.restart display_size board_size)
+  and board = (Tictactoe.play_one display_size (last board) player move)
