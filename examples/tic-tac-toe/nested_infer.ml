@@ -47,8 +47,9 @@ let _infer n (Cnode { alloc; reset; copy; step }) =
   Cnode { alloc; reset; copy; step }
 
 let nested_infer (depth : int) (n_part : int)
-    (alice : (prob * (('in_b -> 'out_b Distribution.t) * 'in_a), 'out_a) cnode)
-    (bob : (prob * (('in_a -> 'out_a Distribution.t) * 'in_b), 'out_b) cnode)
+    (alice :
+      ('in_b, 'out_b Distribution.t) cnode -> (prob * 'in_a, 'out_a) cnode)
+    (bob : ('in_a, 'out_a Distribution.t) cnode -> (prob * 'in_b, 'out_b) cnode)
     (dummy_alice : 'in_a -> 'out_a Distribution.t)
     (dummy_bob : 'in_b -> 'out_b Distribution.t) :
     ('in_a, 'out_a Distribution.t) cnode =

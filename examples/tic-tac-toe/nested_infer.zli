@@ -7,8 +7,8 @@ val mean_float: (float Distribution.t) -A-> float
 
 
 val nested_infer: int -S-> int -S->
-		  ((('in_b -> 'out_b Distribution.t) * 'in_a) ~D~> 'out_a) -S->
-    		  ((('in_a -> 'out_a Distribution.t) * 'in_b) ~D~> 'out_b) -S->
+		  (('in_b -D-> 'out_b Distribution.t) -S-> 'in_a ~D~> 'out_a) -S->
+    		  (('in_a -D-> 'out_a Distribution.t) -S-> 'in_b ~D~> 'out_b) -S->
      		  ('in_a -> 'out_a Distribution.t) -S->
 		  ('in_b -> 'out_b Distribution.t) -S->
 		  'in_a -D-> 'out_a Distribution.t
