@@ -66,14 +66,14 @@ let nested_infer (depth : int) (n_part : int)
     copy_b s_b s_b'
   in
   let step =
-    let _memoize_step_a table (s_a, s_b) (f, x) =
+    let _memoize_step_a table s_a (f, x) =
       (* try Hashtbl.find table x *)
       (* with Not_found -> *)
       let o = step_a s_a (f, x) in
       (* Hashtbl.add table x o; *)
       o
     in
-    let _memoize_step_b table (s_a, s_b) (f, x) =
+    let _memoize_step_b table s_b (f, x) =
       (* try Hashtbl.find table x *)
       (* with Not_found -> *)
       let o = step_b s_b (f, x) in
@@ -81,19 +81,25 @@ let nested_infer (depth : int) (n_part : int)
       o
     in
     let rec _step_a (depth : int) (s_a, s_b) =
-      (* let table = Hashtbl.create 100 in *)
+      let table = Hashtbl.create 100 in
       match depth with
       | 0 -> dummy_alice
       | n ->
-          print_endline (string_of_int n);
-          fun in_a -> step_a s_a (_step_b (depth - 1) (s_a, s_b), in_a)
+          fun in_a ->
+            let s_ac = alloc_a () in
+            copy_a s_a s_ac;
+            reset_a s_ac;
+            _memoize_step_a table s_ac (_step_b (depth - 1) (s_ac, s_b), in_a)
     and _step_b (depth : int) (s_a, s_b) =
-      (* let table = Hashtbl.create 100 in *)
+      let table = Hashtbl.create 100 in
       match depth with
       | 0 -> dummy_bob
       | n ->
-          print_endline (string_of_int n);
-          fun in_b -> step_b s_b (_step_a depth (s_a, s_b), in_b)
+          fun in_b ->
+            let s_bc = alloc_b () in
+            copy_b s_b s_bc;
+            reset_b s_bc;
+            _memoize_step_b table s_bc (_step_a depth (s_a, s_bc), in_b)
     in
     _step_a depth
   in

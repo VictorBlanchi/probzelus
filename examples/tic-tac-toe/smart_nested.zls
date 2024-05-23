@@ -4,7 +4,7 @@ open Engine
 open Nested_infer
 open Infer_pf
 
-let display_size = 100
+let display_size = 70
 let board_size = 3
 
 let utility ((b : board), (p : player))=
@@ -25,7 +25,6 @@ let proba simulate
      ((b0, p0, m0) : board * player * move)) = (b : board) where
      rec init b = (transition b0 m0 p0)
      and init m = m0
-     and nat = 0 fby (nat + 1)
      and init move_dist' = Distribution.dirac m0
      and p = (switch_player p0) fby switch_player p
      and automaton
@@ -34,8 +33,7 @@ let proba simulate
       move_dist' = apply (move_dist, (last b , p))
       and m = sample move_dist'
       and b = transition (last b) m p
-      and () = draw_move_dist display_size (last b) p move_dist'
-      and () = print_int nat
+      (* and () = draw_move_dist display_size (last b) p move_dist'*)
       unless (is_terminal (last b)) then Terminal
     | Terminal ->
       do b = last b done
@@ -59,7 +57,7 @@ let node main () = () where
     then AI
   | AI ->
     do
-      reset move_dist = nested_infer 1 2 model simulate move_dummy simulate_dummy ((last board), player)
+      reset move_dist = nested_infer 5 5 model simulate move_dummy simulate_dummy ((last board), player)
 	every true
       and move = draw move_dist
       and () = draw_move_dist display_size (last board) player move_dist
